@@ -173,6 +173,42 @@ def dashboard():
         pending_orders=pending_orders
     )
 
+@app.route('/orders')
+@login_required
+@restaurant_required
+def orders():
+    """Orders management page"""
+    restaurant = get_current_restaurant()
+    audit_log('ORDERS_PAGE_VIEW', entity_type='PAGE')
+    return render_template('orders.html', restaurant=restaurant)
+
+@app.route('/qr-generator')
+@login_required
+@restaurant_required
+def qr_generator():
+    """QR code generator page"""
+    restaurant = get_current_restaurant()
+    audit_log('QR_GENERATOR_PAGE_VIEW', entity_type='PAGE')
+    return render_template('qr_generator.html', restaurant=restaurant)
+
+@app.route('/reports')
+@login_required
+@restaurant_required
+def reports():
+    """Reports and analytics page"""
+    restaurant = get_current_restaurant()
+    audit_log('REPORTS_PAGE_VIEW', entity_type='PAGE')
+    return render_template('reports.html', restaurant=restaurant)
+
+@app.route('/settings')
+@login_required
+@restaurant_required
+def settings():
+    """Settings page"""
+    restaurant = get_current_restaurant()
+    audit_log('SETTINGS_PAGE_VIEW', entity_type='PAGE')
+    return render_template('settings.html', restaurant=restaurant)
+
 @app.route('/api/orders', methods=['GET', 'POST'])
 @login_required
 @restaurant_required

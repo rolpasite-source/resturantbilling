@@ -410,6 +410,37 @@ with app.app_context():
     try:
         db.create_all()
         logger.info("✅ Database initialized successfully")
+        
+        # Create default admin user if it doesn't exist
+        from datetime import datetime
+        admin_restaurant = Restaurant.query.filter_by(name="Admin Restaurant").first()
+        if not admin_restaurant:
+            admin_restaurant = Restaurant(
+                name="Admin Restaurant",
+                owner_name="Admin",
+                phone="9999999999",
+                email="admin@restaurant.com",
+                is_active=True,
+                license_status="ACTIVE",
+                permanent_menu_url="https://menu.example.com"
+            )
+            db.session.add(admin_restaurant)
+            db.session.commit()
+            logger.info("✅ Admin restaurant created")
+        
+        admin_user = User.query.filter_by(username="admin").first()
+        if not admin_user:
+            admin_user = User(
+                username="admin",
+                email="admin@restaurant.com",
+                restaurant_id=admin_restaurant.id,
+                is_active=True,
+                created_at=datetime.utcnow()
+            )
+            admin_user.set_password("admin123")
+            db.session.add(admin_user)
+            db.session.commit()
+            logger.info("✅ Admin user created (admin/admin123)")
     except Exception as e:
         logger.warning(f"⚠️ Database init warning (may be normal): {e}")
 

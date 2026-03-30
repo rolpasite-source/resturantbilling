@@ -1,0 +1,35 @@
+# Development dependencies (in addition to requirements.txt)
+# Install with: pip install -r requirements-dev.txt
+
+# Testing
+pytest==7.4.0
+pytest-cov==4.1.0
+pytest-flask==1.2.0
+pytest-mock==3.11.1
+
+# Code quality
+black==23.9.1
+flake8==6.1.0
+pylint==2.18.1
+mypy==1.5.0
+
+# Documentation
+sphinx==7.2.6
+sphinx-rtd-theme==1.3.0
+
+# Development server
+python-dotenv==1.0.0
+ipython==8.15.0
+
+# Debugging
+ipdb==0.13.13
+flask-debugtoolbar==0.14.1
+
+# Load testing
+locust==2.15.1
+
+# Database migrations
+flask-migrate==4.0.5
+
+# Linting/Formatting
+isort==5.12.0

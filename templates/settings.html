@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ restaurant.name }} - Settings</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f5f7fa;
+            color: #2c3e50;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .navbar h1 {
+            font-size: 24px;
+        }
+        
+        .navbar-links {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .navbar-links a, .navbar-links button {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .navbar-links a:hover, .navbar-links button:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        .page-header {
+            margin-bottom: 30px;
+        }
+        
+        .page-header h2 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .settings-section {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .settings-section h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #ecf0f1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .form-row.full {
+            grid-template-columns: 1fr;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #2c3e50;
+        }
+        
+        .form-group input,
+        .form-group textarea {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+        }
+        
+        .form-group.readonly input {
+            background: #ecf0f1;
+            cursor: not-allowed;
+        }
+        
+        .url-section {
+            background: #f9f9f9;
+            border: 1px solid #ecf0f1;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .url-item {
+            margin-bottom: 15px;
+        }
+        
+        .url-item label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+        
+        .url-item .url-value {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            word-break: break-all;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: transform 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+        
+        .btn-danger {
+            background: #e74c3c;
+        }
+        
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+        
+        .staff-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        .staff-table th {
+            background: #ecf0f1;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+            color: #2c3e50;
+            border-bottom: 2px solid #ddd;
+        }
+        
+        .staff-table td {
+            padding: 12px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .staff-table tr:hover {
+            background: #f9f9f9;
+        }
+        
+        .role-badge {
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .role-owner {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .role-manager {
+            background: #cfe2ff;
+            color: #084298;
+        }
+        
+        .role-staff {
+            background: #cff4fc;
+            color: #055160;
+        }
+        
+        .role-kitchen {
+            background: #fff3cd;
+            color: #664d03;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .license-info {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .license-info.expired {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        
+        .license-info h4 {
+            color: #155724;
+            margin-bottom: 10px;
+        }
+        
+        .license-info.expired h4 {
+            color: #721c24;
+        }
+        
+        .info-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 10px;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .info-item label {
+            font-weight: bold;
+        }
+        
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .info-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .staff-table {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <div class="navbar">
+        <h1>🍽️ {{ restaurant.name }}</h1>
+        <div class="navbar-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/orders">Orders</a>
+            <a href="/qr-codes">QR Codes</a>
+            <a href="/settings">Settings</a>
+            <form method="GET" action="/auth/logout" style="display:inline;">
+                <button type="submit" class="logout-btn">Logout</button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="page-header">
+            <h2>⚙️ Settings & Configuration</h2>
+            <p>Manage restaurant details, staff, and billing system</p>
+        </div>
+        
+        <div id="messageBox"></div>
+        
+        <!-- Restaurant Information -->
+        <div class="settings-section">
+            <h3>🏪 Restaurant Information</h3>
+            
+            <form id="restaurantForm">
+                {{ csrf_token() }}
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="name">Restaurant Name</label>
+                        <input type="text" id="name" name="name" value="{{ restaurant.name }}" placeholder="Enter restaurant name">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" value="{{ restaurant.email or '' }}" placeholder="contact@restaurant.com">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" name="phone" value="{{ restaurant.phone or '' }}" placeholder="1234567890">
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Address</label>
+                        <input type="text" id="address" name="address" value="{{ restaurant.address or '' }}" placeholder="Restaurant address">
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn">💾 Save Changes</button>
+            </form>
+        </div>
+        
+        <!-- License Information -->
+        <div class="settings-section">
+            <h3>🔐 License Information</h3>
+            
+            {% set is_expired = (restaurant.license_expiry and restaurant.license_expiry <= now) %}
+            <div class="license-info {% if is_expired %}expired{% endif %}">
+                <h4>{% if is_expired %}⚠️ License Expired{% else %}✓ License Active{% endif %}</h4>
+                <div class="info-row">
+                    <div class="info-item">
+                        <label>License Key:</label>
+                        <span>{{ restaurant.license_key }}</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Status:</label>
+                        <span>{{ restaurant.license_status }}</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Expiry Date:</label>
+                        <span>{{ restaurant.license_expiry.strftime('%Y-%m-%d') if restaurant.license_expiry else 'N/A' }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Menu URLs -->
+        <div class="settings-section">
+            <h3>🔗 Menu URLs</h3>
+            
+            <div class="url-section">
+                <div class="url-item">
+                    <label>Permanent Menu URL</label>
+                    <div class="url-value">
+                        <span id="permanentUrl">{{ restaurant.permanent_menu_url }}</span>
+                        <button type="button" class="btn btn-small" onclick="copyToClipboard('permanentUrl')">Copy</button>
+                    </div>
+                </div>
+                
+                <div class="url-item">
+                    <label>Cloudflare Worker URL</label>
+                    <div class="url-value">
+                        <span id="cloudflareUrl">{{ restaurant.cloudflare_url }}</span>
+                        <button type="button" class="btn btn-small" onclick="copyToClipboard('cloudflareUrl')">Copy</button>
+                    </div>
+                </div>
+                
+                <div class="url-item">
+                    <label>Menu Shortcode</label>
+                    <div class="url-value">
+                        <span id="shortcode">{{ restaurant.menu_url_shortcode or 'N/A' }}</span>
+                        <button type="button" class="btn btn-small" onclick="copyToClipboard('shortcode')">Copy</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Staff Management -->
+        <div class="settings-section">
+            <h3>👥 Staff Management</h3>
+            
+            <div style="margin-bottom: 20px;">
+                <p style="color: #7f8c8d; margin-bottom: 15px;">Manage restaurant staff members and their roles</p>
+                <button type="button" class="btn" onclick="toggleAddStaffForm()">+ Add New Staff</button>
+            </div>
+            
+            <!-- Add Staff Form (hidden by default) -->
+            <div id="addStaffForm" style="display: none; margin-bottom: 20px; border: 1px solid #ecf0f1; padding: 20px; border-radius: 5px;">
+                <h4>Add New Staff Member</h4>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="newUsername">Username</label>
+                        <input type="text" id="newUsername" placeholder="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="newEmail">Email</label>
+                        <input type="email" id="newEmail" placeholder="staff@restaurant.com" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="newPassword">Password</label>
+                        <input type="password" id="newPassword" placeholder="min 8 characters" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="newRole">Role</label>
+                        <select id="newRole" style="padding: 12px; border: 1px solid #ddd; border-radius: 5px;">
+                            <option value="staff">Staff</option>
+                            <option value="manager">Manager</option>
+                            <option value="kitchen">Kitchen</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" class="btn btn-small" onclick="addStaffMember()">Add Staff</button>
+                    <button type="button" class="btn btn-small" style="background: #95a5a6;" onclick="toggleAddStaffForm()">Cancel</button>
+                </div>
+            </div>
+            
+            <!-- Staff List -->
+            <table class="staff-table">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="staffList">
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: #7f8c8d;">Loading staff list...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Danger Zone -->
+        <div class="settings-section" style="border: 2px solid #e74c3c;">
+            <h3 style="color: #e74c3c;">⚠️ Danger Zone</h3>
+            
+            <p style="color: #7f8c8d; margin-bottom: 20px;">Be careful with these actions - they cannot be undone</p>
+            
+            <div style="display: flex; gap: 10px;">
+                <button type="button" class="btn btn-danger" onclick="changePassword()">Change Password</button>
+                <button type="button" class="btn btn-danger" onclick="resetSystem()">Reset System</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const CSRF_TOKEN = document.querySelector('input[name="csrf_token"]')?.value || '';
+        
+        // Copy to clipboard
+        function copyToClipboard(elementId) {
+            const text = document.getElementById(elementId).textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                showMessage('✓ Copied to clipboard!', 'success');
+            }).catch(() => {
+                alert('Failed to copy');
+            });
+        }
+        
+        // Show message
+        function showMessage(msg, type) {
+            const msgBox = document.getElementById('messageBox');
+            msgBox.innerHTML = `<div class="${type}">${msg}</div>`;
+            setTimeout(() => msgBox.innerHTML = '', 5000);
+        }
+        
+        // Toggle add staff form
+        function toggleAddStaffForm() {
+            const form = document.getElementById('addStaffForm');
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        // Add staff member
+        async function addStaffMember() {
+            const username = document.getElementById('newUsername').value;
+            const email = document.getElementById('newEmail').value;
+            const password = document.getElementById('newPassword').value;
+            const role = document.getElementById('newRole').value;
+            
+            if (!username || !email || !password) {
+                showMessage('Please fill all fields', 'error');
+                return;
+            }
+            
+            if (password.length < 8) {
+                showMessage('Password must be at least 8 characters', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/staff', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': CSRF_TOKEN
+                    },
+                    body: JSON.stringify({ username, email, password, role })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showMessage('✓ Staff member added successfully', 'success');
+                    document.getElementById('addStaffForm').style.display = 'none';
+                    document.getElementById('newUsername').value = '';
+                    document.getElementById('newEmail').value = '';
+                    document.getElementById('newPassword').value = '';
+                    loadStaffList();
+                } else {
+                    showMessage(data.error || 'Failed to add staff', 'error');
+                }
+            } catch (error) {
+                showMessage('Error: ' + error.message, 'error');
+            }
+        }
+        
+        // Load staff list
+        async function loadStaffList() {
+            try {
+                const response = await fetch('/api/staff');
+                const staff = await response.json();
+                
+                const tbody = document.getElementById('staffList');
+                if (staff.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #7f8c8d;">No staff members</td></tr>';
+                    return;
+                }
+                
+                tbody.innerHTML = staff.map(member => `
+                    <tr>
+                        <td>${member.username}</td>
+                        <td>${member.email}</td>
+                        <td><span class="role-badge role-${member.role}">${member.role.toUpperCase()}</span></td>
+                        <td>${member.is_active ? '✓ Active' : '✗ Inactive'}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-small" onclick="editStaff('${member.id}')">Edit</button>
+                                <button class="btn btn-small btn-danger" onclick="deleteStaff('${member.id}')">Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading staff:', error);
+            }
+        }
+        
+        // Change password
+        function changePassword() {
+            const newPassword = prompt('Enter new password (min 8 characters):');
+            if (!newPassword || newPassword.length < 8) {
+                showMessage('Password must be at least 8 characters', 'error');
+                return;
+            }
+            
+            showMessage('Feature coming soon', 'error');
+        }
+        
+        // Reset system
+        function resetSystem() {
+            if (confirm('Are you sure? This will reset all data including orders and staff.')) {
+                showMessage('Feature coming soon', 'error');
+            }
+        }
+        
+        // Save restaurant info
+        document.getElementById('restaurantForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const data = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                address: document.getElementById('address').value
+            };
+            
+            try {
+                const response = await fetch('/api/restaurant', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': CSRF_TOKEN
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    showMessage('✓ Settings saved successfully', 'success');
+                } else {
+                    showMessage('Error saving settings', 'error');
+                }
+            } catch (error) {
+                showMessage('Error: ' + error.message, 'error');
+            }
+        });
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadStaffList();
+        });
+    </script>
+</body>
+</html>

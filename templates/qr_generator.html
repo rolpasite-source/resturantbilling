@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ restaurant.name }} - QR Codes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f5f7fa;
+            color: #2c3e50;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .navbar h1 {
+            font-size: 24px;
+        }
+        
+        .navbar-links {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .navbar-links a, .navbar-links button {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .navbar-links a:hover, .navbar-links button:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        .page-header {
+            margin-bottom: 30px;
+        }
+        
+        .page-header h2 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .controls {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .control-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 20px;
+            align-items: flex-end;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #2c3e50;
+        }
+        
+        .form-group input {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: transform 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-secondary {
+            background: #3498db;
+            margin-left: 10px;
+        }
+        
+        .btn-secondary:hover {
+            background: #2980b9;
+        }
+        
+        .qr-display {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            min-height: 500px;
+            justify-content: center;
+        }
+        
+        .qr-code-image {
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            padding: 20px;
+            background: white;
+        }
+        
+        .qr-code-image img {
+            max-width: 400px;
+            height: auto;
+            display: block;
+        }
+        
+        .qr-info {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .qr-info h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .qr-info p {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        
+        .qr-url {
+            background: #ecf0f1;
+            padding: 12px;
+            border-radius: 5px;
+            word-break: break-all;
+            font-size: 12px;
+            margin-top: 15px;
+            max-width: 500px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .btn-print {
+            background: #27ae60;
+        }
+        
+        .btn-print:hover {
+            background: #229954;
+        }
+        
+        .btn-copy {
+            background: #f39c12;
+        }
+        
+        .btn-copy:hover {
+            background: #e67e22;
+        }
+        
+        .bulk-section {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            margin-top: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .bulk-section h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+        
+        .bulk-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 15px;
+            align-items: flex-end;
+        }
+        
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+        }
+        
+        @media (max-width: 768px) {
+            .control-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .qr-code-image img {
+                max-width: 300px;
+            }
+        }
+        
+        @media print {
+            .navbar, .controls, .bulk-section, .action-buttons {
+                display: none;
+            }
+            
+            body {
+                background: white;
+            }
+            
+            .qr-display {
+                box-shadow: none;
+                min-height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <div class="navbar">
+        <h1>🍽️ {{ restaurant.name }}</h1>
+        <div class="navbar-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/orders">Orders</a>
+            <a href="/qr-codes">QR Codes</a>
+            <a href="/settings">Settings</a>
+            <form method="GET" action="/auth/logout" style="display:inline;">
+                <button type="submit" class="logout-btn">Logout</button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="page-header">
+            <h2>🔲 QR Code Generator</h2>
+            <p>Generate and print table-specific QR codes for customer ordering</p>
+        </div>
+        
+        <!-- Generate Single QR -->
+        <div class="controls">
+            <h3>Generate QR Code</h3>
+            <div class="control-row">
+                <div class="form-group">
+                    <label for="tableNumber">Table Number</label>
+                    <input type="number" id="tableNumber" placeholder="e.g., 01" min="1" max="100" value="01">
+                </div>
+                <div class="form-group">
+                    <label>Preview URL</label>
+                    <input type="text" id="previewUrl" readonly style="background: #ecf0f1;">
+                </div>
+                <button class="btn" onclick="generateQR()">Generate QR</button>
+            </div>
+        </div>
+        
+        <!-- QR Display -->
+        <div id="messageBox"></div>
+        
+        <div class="qr-display">
+            <div id="qrContainer" class="loading">
+                Enter a table number and click "Generate QR" to create a QR code
+            </div>
+            <div id="qrInfo" style="display: none;" class="qr-info">
+                <h3>Table <span id="tableLabel">01</span></h3>
+                <p>Customers scan to view menu and place orders</p>
+                <div class="qr-url">
+                    URL: <span id="urlDisplay"></span>
+                </div>
+            </div>
+            <div id="actionButtons" style="display: none;" class="action-buttons">
+                <button class="btn btn-print" onclick="printQR()">🖨️ Print</button>
+                <button class="btn btn-copy" onclick="copyQRUrl()">📋 Copy URL</button>
+            </div>
+        </div>
+        
+        <!-- Bulk Generation -->
+        <div class="bulk-section">
+            <h3>📦 Bulk Generate QR Codes</h3>
+            <p style="color: #7f8c8d; margin-bottom: 15px;">Generate QR codes for multiple tables at once</p>
+            <div class="bulk-form">
+                <div class="form-group">
+                    <label for="startTable">Start Table</label>
+                    <input type="number" id="startTable" placeholder="e.g., 01" min="1" value="1">
+                </div>
+                <div class="form-group">
+                    <label for="endTable">End Table</label>
+                    <input type="number" id="endTable" placeholder="e.g., 10" min="1" value="10">
+                </div>
+                <button class="btn" onclick="generateBulkQR()">Generate & Download</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const CSRF_TOKEN = '{{ csrf_token() }}';
+        
+        // Update preview URL
+        document.getElementById('tableNumber').addEventListener('input', (e) => {
+            const tableNum = e.target.value.padStart(2, '0');
+            const url = `{{ restaurant.permanent_menu_url }}?table=${tableNum}`;
+            document.getElementById('previewUrl').value = url;
+        });
+        
+        // Generate single QR code
+        async function generateQR() {
+            const tableNum = document.getElementById('tableNumber').value.padStart(2, '0');
+            
+            if (!tableNum || tableNum < 1) {
+                showMessage('Please enter a valid table number', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/qr-code?table=${tableNum}`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    const container = document.getElementById('qrContainer');
+                    container.innerHTML = `
+                        <div class="qr-code-image">
+                            <img src="data:image/png;base64,${data.qr_code}" alt="QR Code for Table ${tableNum}">
+                        </div>
+                    `;
+                    
+                    document.getElementById('tableLabel').textContent = tableNum;
+                    document.getElementById('urlDisplay').textContent = data.url;
+                    document.getElementById('qrInfo').style.display = 'block';
+                    document.getElementById('actionButtons').style.display = 'flex';
+                } else {
+                    showMessage('Error generating QR code: ' + data.error, 'error');
+                }
+            } catch (error) {
+                showMessage('Error: ' + error.message, 'error');
+            }
+        }
+        
+        // Print QR code
+        function printQR() {
+            window.print();
+        }
+        
+        // Copy URL to clipboard
+        function copyQRUrl() {
+            const url = document.getElementById('urlDisplay').textContent;
+            navigator.clipboard.writeText(url).then(() => {
+                showMessage('✓ URL copied to clipboard!', 'success');
+            }).catch(() => {
+                alert('Failed to copy URL');
+            });
+        }
+        
+        // Generate bulk QR codes
+        async function generateBulkQR() {
+            const start = parseInt(document.getElementById('startTable').value);
+            const end = parseInt(document.getElementById('endTable').value);
+            
+            if (start < 1 || end < start) {
+                showMessage('Please enter valid table numbers', 'error');
+                return;
+            }
+            
+            if (end - start > 50) {
+                showMessage('Cannot generate more than 50 QR codes at once', 'error');
+                return;
+            }
+            
+            try {
+                showMessage('⏳ Generating QR codes...', 'success');
+                
+                const qrCodes = [];
+                for (let i = start; i <= end; i++) {
+                    const tableNum = i.toString().padStart(2, '0');
+                    const response = await fetch(`/api/qr-code?table=${tableNum}`);
+                    const data = await response.json();
+                    if (response.ok) {
+                        qrCodes.push({
+                            table: tableNum,
+                            qr_code: data.qr_code,
+                            url: data.url
+                        });
+                    }
+                }
+                
+                // Create HTML for printing
+                const html = generatePrintableHTML(qrCodes);
+                
+                // Open in new window for printing
+                const win = window.open('', '_blank');
+                win.document.write(html);
+                win.document.close();
+                
+                showMessage(`✓ Generated ${qrCodes.length} QR codes!`, 'success');
+            } catch (error) {
+                showMessage('Error: ' + error.message, 'error');
+            }
+        }
+        
+        // Generate printable HTML for bulk QR codes
+        function generatePrintableHTML(qrCodes) {
+            let html = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; }
+                        .qr-item { text-align: center; margin: 20px; page-break-inside: avoid; }
+                        .qr-item img { width: 300px; height: 300px; }
+                        .qr-item h3 { margin: 10px 0; }
+                        @media print { body { margin: 0; } }
+                    </style>
+                </head>
+                <body>
+                    <h1>{{ restaurant.name }} - QR Codes</h1>
+                    <p>Scan QR codes to view menu and place orders</p>
+            `;
+            
+            qrCodes.forEach(item => {
+                html += `
+                    <div class="qr-item">
+                        <h3>Table ${item.table}</h3>
+                        <img src="data:image/png;base64,${item.qr_code}" alt="QR Code for Table ${item.table}">
+                        <p style="font-size: 12px; color: #999;">URL: ${item.url}</p>
+                    </div>
+                `;
+            });
+            
+            html += `
+                    <footer style="margin-top: 50px; text-align: center; color: #999; font-size: 12px;">
+                        <p>Generated on ${new Date().toLocaleString()}</p>
+                    </footer>
+                </body>
+                </html>
+            `;
+            
+            return html;
+        }
+        
+        // Show message
+        function showMessage(msg, type) {
+            const msgBox = document.getElementById('messageBox');
+            msgBox.innerHTML = `<div class="${type}">${msg}</div>`;
+            setTimeout(() => msgBox.innerHTML = '', 5000);
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            const tableNum = '01';
+            const url = `{{ restaurant.permanent_menu_url }}?table=${tableNum}`;
+            document.getElementById('previewUrl').value = url;
+        });
+    </script>
+</body>
+</html>

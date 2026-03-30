@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ restaurant.name }} - Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f5f7fa;
+            color: #2c3e50;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .navbar h1 {
+            font-size: 24px;
+        }
+        
+        .navbar-right {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        
+        .welcome-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .welcome-section h2 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .welcome-section p {
+            color: #7f8c8d;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            text-align: center;
+            border-top: 4px solid #667eea;
+        }
+        
+        .stat-card h3 {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .actions-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .action-btn {
+            background: white;
+            border: 2px solid #667eea;
+            color: #667eea;
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .action-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .orders-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .orders-section h3 {
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+        
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .orders-table th {
+            background: #f5f7fa;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+            color: #2c3e50;
+            border-bottom: 2px solid #ddd;
+        }
+        
+        .orders-table td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-confirmed { background: #d1ecf1; color: #0c5460; }
+        .status-preparing { background: #cce5ff; color: #004085; }
+        .status-ready { background: #d4edda; color: #155724; }
+        .status-served { background: #e2e3e5; color: #383d41; }
+        .status-paid { background: #d4edda; color: #155724; }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div>
+            <h1>🍽️ {{ restaurant.name }}</h1>
+            <p style="font-size: 12px; opacity: 0.9;">Restaurant Billing System</p>
+        </div>
+        <div class="navbar-right">
+            <span>👤 {{ session.username }}</span>
+            <a href="{{ url_for('auth.logout') }}" class="logout-btn">Logout</a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="welcome-section">
+            <h2>Welcome back, {{ session.username }}!</h2>
+            <p>Manage your restaurant orders and track revenue in real-time.</p>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Orders Today</h3>
+                <div class="value">{{ total_orders }}</div>
+            </div>
+            <div class="stat-card">
+                <h3>Revenue Today</h3>
+                <div class="value">₹ {{ "%.0f"|format(total_revenue) }}</div>
+            </div>
+            <div class="stat-card">
+                <h3>Pending Orders</h3>
+                <div class="value">{{ pending_orders }}</div>
+            </div>
+        </div>
+        
+        <div class="actions-section">
+            <button class="action-btn" onclick="newOrder()">
+                ➕ New Order
+            </button>
+            <button class="action-btn" onclick="generateQR()">
+                📱 Generate QR Codes
+            </button>
+            <button class="action-btn" onclick="viewReports()">
+                📊 View Reports
+            </button>
+            <button class="action-btn" onclick="settings()">
+                ⚙️ Settings
+            </button>
+        </div>
+        
+        <div class="orders-section">
+            <h3>Recent Orders</h3>
+            <table class="orders-table" id="ordersTable">
+                <thead>
+                    <tr>
+                        <th>Order #</th>
+                        <th>Customer</th>
+                        <th>Table</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Payment</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody id="ordersBody">
+                    <tr><td colspan="7" style="text-align: center; padding: 40px;">
+                        <div class="loading"></div>
+                    </td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <script>
+        function newOrder() {
+            alert('New Order form will open here');
+        }
+        
+        function generateQR() {
+            window.location.href = '/qr-generator';
+        }
+        
+        function viewReports() {
+            alert('Reports will open here');
+        }
+        
+        function settings() {
+            alert('Settings will open here');
+        }
+        
+        // Load recent orders
+        function loadOrders() {
+            fetch('/api/orders?limit=10')
+                .then(r => r.json())
+                .then(data => {
+                    const tbody = document.getElementById('ordersBody');
+                    tbody.innerHTML = '';
+                    
+                    if (!data.orders || data.orders.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No orders yet</td></tr>';
+                        return;
+                    }
+                    
+                    data.orders.forEach(order => {
+                        const row = tbody.insertRow();
+                        row.innerHTML = `
+                            <td>${order.order_number}</td>
+                            <td>${order.customer_name}</td>
+                            <td>${order.table_number || '-'}</td>
+                            <td>₹ ${order.total_amount.toFixed(0)}</td>
+                            <td><span class="status-badge status-${order.status.toLowerCase()}">${order.status}</span></td>
+                            <td><span class="status-badge status-${order.payment_status.toLowerCase()}">${order.payment_status}</span></td>
+                            <td>${new Date(order.created_at).toLocaleTimeString()}</td>
+                        `;
+                    });
+                })
+                .catch(err => {
+                    console.error('Error loading orders:', err);
+                    document.getElementById('ordersBody').innerHTML = 
+                        '<tr><td colspan="7" class="empty-state">Error loading orders</td></tr>';
+                });
+        }
+        
+        // Load orders on page load
+        loadOrders();
+        
+        // Refresh every 10 seconds
+        setInterval(loadOrders, 10000);
+    </script>
+</body>
+</html>

@@ -412,7 +412,6 @@ with app.app_context():
         logger.info("✅ Database initialized successfully")
         
         # Create default admin user if it doesn't exist
-        from datetime import datetime
         admin_restaurant = Restaurant.query.filter_by(name="Admin Restaurant").first()
         if not admin_restaurant:
             admin_restaurant = Restaurant(
@@ -442,7 +441,7 @@ with app.app_context():
             db.session.commit()
             logger.info("✅ Admin user created (admin/admin123)")
     except Exception as e:
-        logger.warning(f"⚠️ Database init warning (may be normal): {e}")
+        logger.warning(f"⚠️ Database init warning: {e}")
 
 
 # ===== RUN =====

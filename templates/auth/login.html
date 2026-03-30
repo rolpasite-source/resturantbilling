@@ -150,6 +150,7 @@
         {% endif %}
         
         <form method="POST" action="{{ url_for('auth.login') }}">
+            {{ csrf_token() }}
             <div class="form-group">
                 <label for="username">Username:</label>
                 <input 

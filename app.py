@@ -417,10 +417,10 @@ with app.app_context():
             admin_restaurant = Restaurant(
                 name="Admin Restaurant",
                 owner_name="Admin",
-                phone="9999999999",
-                email="admin@restaurant.com",
-                is_active=True,
+                contact_no="9999999999",
+                license_key="ADMIN-LICENSE-KEY-001",
                 license_status="ACTIVE",
+                is_active=True,
                 permanent_menu_url="https://menu.example.com"
             )
             db.session.add(admin_restaurant)
@@ -433,6 +433,7 @@ with app.app_context():
                 username="admin",
                 email="admin@restaurant.com",
                 restaurant_id=admin_restaurant.id,
+                role="owner",
                 is_active=True,
                 created_at=datetime.utcnow()
             )

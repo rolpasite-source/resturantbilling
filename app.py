@@ -406,29 +406,12 @@ def stats():
 
 # ===== DATABASE INITIALIZATION =====
 
-def init_db():
-    """Initialize database with error handling"""
+with app.app_context():
     try:
-        with app.app_context():
-            db.create_all()
-            logger.info("✅ Database initialized successfully")
-            return True
+        db.create_all()
+        logger.info("✅ Database initialized successfully")
     except Exception as e:
-        logger.error(f"❌ Database initialization error: {e}")
-        return False
-
-# Initialize on startup
-init_db()
-
-# Also initialize when app first handles a request
-@app.before_first_request
-def before_first_request():
-    """Initialize database before first request"""
-    try:
-        with app.app_context():
-            db.create_all()
-    except Exception as e:
-        logger.error(f"Error during first request init: {e}")
+        logger.warning(f"⚠️ Database init warning (may be normal): {e}")
 
 
 # ===== RUN =====
